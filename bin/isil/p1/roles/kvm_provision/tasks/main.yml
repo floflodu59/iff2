@@ -53,7 +53,7 @@
      --hostname {{ vm_name }} \
      --root-password password:{{ vm_root_pass }} \
      --ssh-inject 'root:file:{{ ssh_key }}' \
-     --firstboot /srv/iff/phase1/setupnetwork.sh \
+     --firstboot /srv/iff/bin/isil/p1/setupnetwork.sh \
      --network \
      --uninstall cloud-init --selinux-relabel
     when: copy_results is changed

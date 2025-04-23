@@ -89,6 +89,7 @@ for i in "${listarray[@]}"
 do
 	if [ $i -eq 1 ] ; then
 		echo "Installation d'ISIL..."
+		/srv/iff/bin/isil.sh
 	fi
 	if [ $i -eq 2 ] ; then
 		echo "Installation de la machine d'accès..."

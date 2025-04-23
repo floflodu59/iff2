@@ -1,0 +1,100 @@
+- name: Config VM with apps
+  hosts: myhosts
+  gather_facts: yes
+  become: no
+
+  tasks:
+    - name: Install Growroot
+      apt: name=cloud-initramfs-growroot state=present update_cache=true
+
+    - name: Resize filesystem - Step 1
+      ansible.builtin.command:
+        cmd: growpart /dev/vda 1
+
+    - name: Resize filesystem - Step 2
+      ansible.builtin.command:
+        cmd: resize2fs /dev/vda1
+
+    - name: Install cockpit
+      apt: name=cockpit state=present update_cache=true
+
+    - name: Install Java
+      apt: name=default-jre state=present update_cache=true
+
+    - name: Install Curl thing
+      ansible.builtin.command:
+        cmd: curl -fsSL https://deb.nodesource.com/setup_14.x
+
+    - name: Install NodeJs
+      apt: name=nodejs state=present update_cache=true
+
+    - name: Install Apache2
+      apt: name=apache2 state=present update_cache=true
+
+#    - name: Enable and start Apache2
+#      ansible.builtin.command:
+#        cmd: systemctl enable apache2.service && systemctl start apache2.service
+
+    - name: Install Php
+      apt:
+        name:
+            - php8.1
+            - php8.1-cli
+            - php8.1-common
+            - php8.1-imap
+            - php8.1-redis
+            - php8.1-snmp
+            - php8.1-xml
+            - php8.1-zip
+            - php8.1-mbstring
+            - php8.1-curl
+            - libapache2-mod-php
+            - php8.1-mysql
+        state: present
+        update_cache: true
+
+#    - name: Install PostgreSQL
+#      apt:
+#        name:
+#        - postgresql
+#        - postgresql-client
+#        state: present
+#        update_cache: true
+#
+#    - name: Enable and start Postresql
+#      ansible.builtin.command:
+#        cmd: systemctl enable postgresql && systemctl start postgresql
+#
+#    - name: Enable and start Apache2
+#      ansible.builtin.command:
+#        cmd: systemctl enable apache2 && systemctl start apache2
+#
+#    - name: Configure PostgreSQL Authentication
+#      ansible.builtin.command:
+#        cmd: sed -i 's/local   all             postgres                                peer/local   all             postgres                                trust/g' /etc/postgresql/14/main/pg_hba.conf
+#
+#    - name: Restart PostgreSQL
+#      ansible.builtin.command:
+#        cmd: systemctl restart postgresql
+#
+#    - name: Configure PostgreSQL
+#      ansible.builtin.command:
+#        cmd: psql -U postgres -c "Alter USER postgres WITH PASSWORD 'PASSWORD';"
+#
+#    - name: Create ISIL Database
+#      ansible.builtin.command:
+#        cmd: psql -U postgres -c "create database isil;"
+#
+#    - name: Configure PostgreSQL Authentication
+#      ansible.builtin.command:
+#        cmd: sed -i 's/local   all             postgres                                trust/local   all             postgres                                md5/g' /etc/postgresql/14/main/pg_hba.conf#
+#
+    - name: Install certbot
+      apt:
+        name:
+        - certbot
+        - python3-certbot-apache
+
+#    - name: Certifiy apache
+#      ansible.builtin.command:
+#        cmd: certbot -apache
