@@ -53,29 +53,29 @@ fi
 
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "\nLe programme va maintenant effectuer la configuration réseau." 7 60
 echo "CONFIGURATION RESEAU EN COURS..."
-# rm -rf /etc/netplan/*
-# echo "# This is an automatically generated network config file by the IFF project." > /etc/netplan/00-installer-config.yaml
-# echo "network:" >> /etc/netplan/00-installer-config.yaml
-# echo " ethernets:" >> /etc/netplan/00-installer-config.yaml
-# echo "  $interface:" >> /etc/netplan/00-installer-config.yaml
-# echo "   dhcp4: no" >> /etc/netplan/00-installer-config.yaml
-# echo " bridges:" >> /etc/netplan/00-installer-config.yaml
-# echo "  br0:" >> /etc/netplan/00-installer-config.yaml
-# echo "   interfaces: [$interface]" >> /etc/netplan/00-installer-config.yaml
-# echo "   addresses: [$ipaddress/$masklength]" >> /etc/netplan/00-installer-config.yaml
-# echo "   gateway4: $gatewayaddress" >> /etc/netplan/00-installer-config.yaml
-# echo "   nameservers:" >> /etc/netplan/00-installer-config.yaml
-# echo "    addresses:" >> /etc/netplan/00-installer-config.yaml
-# echo "    - 8.8.8.8" >> /etc/netplan/00-installer-config.yaml
-# echo "    - 1.1.1.1" >> /etc/netplan/00-installer-config.yaml
-# echo "    - $gatewayaddress" >> /etc/netplan/00-installer-config.yaml
-# echo " version: 2" >> /etc/netplan/00-installer-config.yaml
-# netplan apply
-# echo "======================"
-# echo "GENERATION DE LA CLE SSH"
-# ssh-keygen -t rsa -f /home/isc/.ssh/id_rsa
-# echo "CONFIGURATION HOTE TERMINEE"
-# echo "======================"
+rm -rf /etc/netplan/*
+echo "# This is an automatically generated network config file by the IFF project." > /etc/netplan/00-installer-config.yaml
+echo "network:" >> /etc/netplan/00-installer-config.yaml
+echo " ethernets:" >> /etc/netplan/00-installer-config.yaml
+echo "  $interface:" >> /etc/netplan/00-installer-config.yaml
+echo "   dhcp4: no" >> /etc/netplan/00-installer-config.yaml
+echo " bridges:" >> /etc/netplan/00-installer-config.yaml
+echo "  br0:" >> /etc/netplan/00-installer-config.yaml
+echo "   interfaces: [$interface]" >> /etc/netplan/00-installer-config.yaml
+echo "   addresses: [$ipaddress/$masklength]" >> /etc/netplan/00-installer-config.yaml
+echo "   gateway4: $gatewayaddress" >> /etc/netplan/00-installer-config.yaml
+echo "   nameservers:" >> /etc/netplan/00-installer-config.yaml
+echo "    addresses:" >> /etc/netplan/00-installer-config.yaml
+echo "    - 8.8.8.8" >> /etc/netplan/00-installer-config.yaml
+echo "    - 1.1.1.1" >> /etc/netplan/00-installer-config.yaml
+echo "    - $gatewayaddress" >> /etc/netplan/00-installer-config.yaml
+echo " version: 2" >> /etc/netplan/00-installer-config.yaml
+netplan apply
+echo "======================"
+echo "GENERATION DE LA CLE SSH"
+ssh-keygen -t rsa -f /home/isc/.ssh/id_rsa
+echo "CONFIGURATION HOTE TERMINEE"
+echo "======================"
 
 dialog --checklist "Choisissez ce qu'il faut installer:" 10 40 3 \
         1 "Machine virtuelle ISIL" on \
