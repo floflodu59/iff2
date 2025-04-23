@@ -1,3 +1,4 @@
+#!/bin/bash
 function networkconfig {
 	dialog --title "INSTALLATION VM ISIL" --msgbox "Le programme va maintenant vous sdemander les informations de configuration réseau." 7 60
 	ipaddress="192.168.1.100"
