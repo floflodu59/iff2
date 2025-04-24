@@ -1,0 +1,25 @@
+- name: Config VM with apps
+  hosts: myhosts
+  gather_facts: yes
+  become: no
+
+  tasks:
+    - name: Install Growroot
+      apt: name=cloud-initramfs-growroot state=present update_cache=true
+
+    - name: Resize filesystem - Step 1
+      ansible.builtin.command:
+        cmd: growpart /dev/vda 1
+
+    - name: Resize filesystem - Step 2
+      ansible.builtin.command:
+        cmd: resize2fs /dev/vda1
+
+    - name: Install Cockpit
+      apt: name=cockpit state=present update_cache=true
+
+    - name: Install Desktop
+      apt: name=ubuntu-desktop state=present update_cache=true
+
+    - name: Install Teamviewer
+      apt: name=teamviewer state=present update_cache=true

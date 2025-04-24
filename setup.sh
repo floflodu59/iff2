@@ -13,7 +13,7 @@ apt-get install dialog
 mkdir /srv/iff/tmp
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "\nCe programme permet d'installer les outils de virtualisation pour les déploiments ISIL.\n\nMerci de bien suivre la documentation associée afin de pouvoir completer cette installation avec succès." 11 60
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "\nLe programme va maintenant installer les prérequis." 7 60
-apt-get install ansible cockpit cockpit-pcp qemu qemu-kvm bridge-utils cpu-checker libvirt-clients libvirt-daemon postgresql cockpit-machines cloud-image-utils ssmtp -y
+apt-get install dose2unix ansible cockpit cockpit-pcp qemu qemu-kvm bridge-utils cpu-checker libvirt-clients libvirt-daemon postgresql cockpit-machines cloud-image-utils ssmtp -y
 function networkconfig {
 	dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "\nLe programme va maintenant afficher les interfaces réseau de votre machine.\nMerci de bien vouloir noter le nom de celle qui doit être utilisée pour le serveur." 10 60
 	ip a
@@ -89,10 +89,15 @@ for i in "${listarray[@]}"
 do
 	if [ $i -eq 1 ] ; then
 		echo "Installation d'ISIL..."
+		dos2unix /srv/iff/bin/isil.sh
+		chmod u+x /srv/iff/bin/isil.sh
 		/srv/iff/bin/isil.sh
 	fi
 	if [ $i -eq 2 ] ; then
 		echo "Installation de la machine d'accès..."
+		dos2unix /srv/iff/bin/access.sh
+		chmod u+x /srv/iff/bin/access.sh
+		/srv/iff/bin/access.sh
 	fi
 	if [ $i -eq 3 ] ; then
 		echo "Mise en place de la sauvegarde..."

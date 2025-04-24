@@ -53,13 +53,13 @@ echo 'echo "network:" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/
 echo 'echo " ethernets:" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'echo "  enp1s0:" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'echo "   dhcp4: no" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
-echo 'echo "   addresses: ['$guestip'/'$guestmask']" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
-echo 'echo "   gateway4: '$guestgateway'" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
+echo 'echo "   addresses: ['$ipaddress'/'$masklength']" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
+echo 'echo "   gateway4: '$gatewayaddress'" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'echo "   nameservers:" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'echo "    addresses:" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'echo "    - 8.8.8.8" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'echo "    - 1.1.1.1" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
-echo 'echo "    - '$guestgateway'" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
+echo 'echo "    - '$gatewayaddress'" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'echo " version: 2" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'netplan apply' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'ssh-keygen -A' >> /srv/iff/bin/isil/p1/setupnetwork.sh
