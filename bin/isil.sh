@@ -82,7 +82,7 @@ echo "cleanup_tmp: no" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main
 echo "ssh_key: /root/.ssh/id_rsa.pub" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
 echo "# defaults file for kvm_provision" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
 echo "[myhosts]" > /srv/iff/bin/isil/p2/inventory.ini
-echo "$guestip" >> /srv/iff/bin/isil/p2/inventory.ini
+echo "$ipaddress" >> /srv/iff/bin/isil/p2/inventory.ini
 echo "[all:vars]" >> /srv/iff/bin/isil/p2/inventory.ini
 echo "ansible_user=root" >> /srv/iff/bin/isil/p2/inventory.ini
 echo "ansible_pass=$guestpwd" >> /srv/iff/bin/isil/p2/inventory.ini
