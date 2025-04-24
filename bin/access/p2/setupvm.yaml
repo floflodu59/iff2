@@ -21,5 +21,6 @@
     - name: Install Desktop
       apt: name=ubuntu-desktop state=present update_cache=true
 
-    - name: Install Teamviewer
-      apt: name=teamviewer state=present update_cache=true
+    - name: Reboot virtual machine
+      ansible.builtin.command:
+        cmd: reboot

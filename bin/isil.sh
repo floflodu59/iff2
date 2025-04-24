@@ -45,6 +45,9 @@ vmcfg=$(dialog --ok-label "Continuer" \
 2>&1 1>&3)
 exec 3>&-
 IFS=$'\n'; vmcfgarray=($vmcfg); unset IFS;
+guestram=${vmcfgarray[1]}
+guestsize=${vmcfgarray[0]}
+guestpwd=${vmcfgarray[2]}
 echo "CONFIGURATION RESEAU INVITE EN COURS..."
 sed -i 's/ram_mb: 2048/ram_mb: '$guestram'/g' /srv/iff/bin/isil/p1/kvm_provision.yaml
 echo 'echo "CONFIGURATION RESEAU EN COURS..."' > /srv/iff/bin/isil/p1/setupnetwork.sh

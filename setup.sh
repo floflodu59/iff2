@@ -76,6 +76,25 @@ echo "GENERATION DE LA CLE SSH"
 ssh-keygen -t rsa -f /home/isc/.ssh/id_rsa
 echo "CONFIGURATION HOTE TERMINEE"
 echo "======================"
+dbpassword=""
+exec 3>&1
+dbcfg=$(dialog --ok-label "Continuer" \
+		--title "CONFIGURATION BASE DE DONNÉES" \
+		--form "Entrez la configuration de la base de données :" \
+15 80 0 \
+		"Mot de passe de la base de données :"	1 1	"$dbpassword" 		1 40 20 0 \
+2>&1 1>&3)
+exec 3>&-
+IFS=$'\n'; dbcfgarray=($dbcfg); unset IFS;
+dbpassword=${dbcfgarray[0]}
+
+echo "CONFIGURATION DE LA BASE DE DONNEES"
+systemctl enable postgresql && systemctl start postgresql
+sed -i 's/local   all             postgres                                peer/local   all             postgres                                trust/g' /etc/postgresql/14/main/pg_hba.conf
+systemctl restart postgresql
+psql -U postgres -c "Alter USER postgres WITH PASSWORD '$dbpassword';"
+psql -U postgres -c "create database isil;"
+sed -i 's/local   all             postgres                                trust/local   all             postgres                                md5/g' /etc/postgresql/14/main/pg_hba.conf
 
 dialog --checklist "Choisissez ce qu'il faut installer:" 10 40 3 \
         1 "Machine virtuelle ISIL" on \
