@@ -38,4 +38,4 @@
 
     - name: Upgrade to newest
       ansible.builtin.command:
-        cmd: growpart /dev/vda 1
+        cmd: do-release-upgrade
