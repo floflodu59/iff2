@@ -23,15 +23,19 @@
 
     - name: Active Slim
       ansible.builtin.command:
-        cmd: systemctl set-default graphical.target   
+        cmd: systemctl set-default graphical.target
 
     - name: Install Desktop
       apt: name=ubuntu-desktop      state=present update_cache=true
-      
+
     - name: Download TeamViever
       ansible.builtin.command:
         cmd: wget https://dl.teamviewer.com/download/linux/version_15x/teamviewer_15.64.3_amd64.deb /srv
-  
+
     - name: Install TeamViewer
       ansible.builtin.command:
         cmd: apt install /srv/teamviewer_15.64.3_amd64.deb
+
+    - name: Upgrade to newest
+      ansible.builtin.command:
+        cmd: growpart /dev/vda 1
