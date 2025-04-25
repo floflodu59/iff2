@@ -1,6 +1,6 @@
 #!/bin/bash
 function networkconfig {
-	dialog --title "INSTALLATION VM ACCES DISTANT" --msgbox "Le programme va maintenant vous sdemander les informations de configuration réseau." 7 60
+	dialog --title "INSTALLATION VM ACCES DISTANT" --msgbox "Le programme va maintenant vous demander les informations de configuration réseau." 7 60
 	ipaddress="192.168.1.100"
 	gatewayaddress="192.168.1.1"
 	masklength="24"
@@ -95,6 +95,6 @@ echo "======================"
 dialog --title "INSTALLATION VM ISIL" --msgbox "Le programme va maintenant creer la machine virtuelle." 7 60
 echo "EXECUTION PHASE 1"
 ansible-playbook /srv/iff/bin/access/p1/kvm_provision.yaml
-dialog --infobox "Merci de patienter le temps du redémarrage de la machine virtuelle." 10 60 ; sleep 120
+dialog --infobox "Merci de patienter le temps du redémarrage de la VM." 1 60 ; sleep 120
 echo "EXECUTION PHASE 2"
 ansible-playbook /srv/iff/bin/access/p2/setupvm.yaml -i /srv/iff/bin/access/p2/inventory.ini

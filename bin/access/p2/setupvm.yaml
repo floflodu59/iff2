@@ -18,9 +18,20 @@
     - name: Install Cockpit
       apt: name=cockpit state=present update_cache=true
 
-    - name: Install Desktop
-      apt: name=ubuntu-desktop state=present update_cache=true
+    - name: Install Slim
+      apt: name=slim       state=present update_cache=true
 
-    - name: Reboot virtual machine
+    - name: Active Slim
       ansible.builtin.command:
-        cmd: reboot
+        cmd: systemctl set-default graphical.target   
+
+    - name: Install Desktop
+      apt: name=ubuntu-desktop      state=present update_cache=true
+      
+    - name: Download TeamViever
+      ansible.builtin.command:
+        cmd: wget https://dl.teamviewer.com/download/linux/version_15x/teamviewer_15.64.3_amd64.deb /srv
+  
+    - name: Install TeamViewer
+      ansible.builtin.command:
+        cmd: apt install /srv/teamviewer_15.64.3_amd64.deb
