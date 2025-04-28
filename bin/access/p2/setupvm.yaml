@@ -43,4 +43,4 @@
 
     - name: Upgrade to newest
       ansible.builtin.command:
-        cmd: do-release-upgrade
+        cmd: do-release-upgrade -f DistUpgradeViewNonInteractive
