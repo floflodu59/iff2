@@ -95,6 +95,6 @@ echo "======================"
 dialog --title "INSTALLATION VM ISIL" --msgbox "Le programme va maintenant creer la machine virtuelle." 7 60
 echo "EXECUTION PHASE 1"
 ansible-playbook /srv/iff/bin/access/p1/kvm_provision.yaml
-dialog --infobox "Merci de patienter le temps du redémarrage de la VM." 1 60 ; sleep 120
+dialog --infobox "Merci de patienter le temps du redémarrage de la VM." 5 60 ; sleep 120
 echo "EXECUTION PHASE 2"
 ansible-playbook /srv/iff/bin/access/p2/setupvm.yaml -i /srv/iff/bin/access/p2/inventory.ini
