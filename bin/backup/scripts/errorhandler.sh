@@ -46,7 +46,7 @@ function sendmail
                 echo "SFF 1.0" >> /backup/scripts/sendmail
         fi
 	if [ $status -eq "${stamp}2" ] ; then
-		echo "Subject: [${sujet}][${site}] SUCCES - La sauvegarde des donnees ISIL s'est effectuee." >> /backup/scripts/sendmail #Changer ici au besoin
+		echo "Subject: [${sujet}][${site}] SUCCES - La sauvegarde des donnees ISIL ne s'est pas effectuee correctement." >> /backup/scripts/sendmail #Changer ici au besoin
 		echo "Bonjour," >> /backup/scripts/sendmail
 		echo "La sauvegarde du serveur ISIL du site ${site} n'a pas aboutie correctement en raison d'un ou plusieurs des composants de sauvegarde qui ne se sont pas execute correctement." >> /backup/scripts/sendmail
 		echo "Bonne journee," >> /backup/scripts/sendmail
@@ -54,7 +54,7 @@ function sendmail
         fi
         /usr/sbin/ssmtp $sender < /backup/scripts/sendmail
         #rm /backup/scripts/sendmail
-        echo "${current_date} - Envoi du mail effectue." >> /backup/exportdb/history.log
+        echo "${current_date} - Envoi du mail effectue." >> /backup/history.log
 }
 
 

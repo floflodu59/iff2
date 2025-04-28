@@ -7,7 +7,7 @@ function networkconfig {
 	exec 3>&1
 	ipcfg=$(dialog --ok-label "Continuer" \
 			--title "CONFIGURATION RESEAU" \
-			--form "Entrez la configuration réseau de la VM ISIL :" \
+			--form "Entrez la configuration réseau de la VM ACCESS :" \
 	15 80 0 \
 			"Adresse IPv4 serveur :"	1 1	"$ipaddress" 		1 40 20 0 \
 			"Passerelle par défaut IPv4 :"   					2 1	"$gatewayaddress"  		2 40 20 0 \
@@ -37,10 +37,10 @@ guestram=4096
 exec 3>&1
 vmcfg=$(dialog --ok-label "Continuer" \
 		--title "CONFIGURATION DE LINUX" \
-		--form "Entrez la configuration réseau de la VM ISIL :" \
+		--form "Entrez la configuration réseau de la VM ACCESS :" \
 15 80 0 \
-		"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 40 20 0 \
-		"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 40 20 0 \
+		"Taille de la VM ACCESS en Go :"	1 1	"$guestsize" 		1 40 20 0 \
+		"Taille de la mémoire de la VM ACCESS en Mo :"   					2 1	"$guestram"  		2 40 20 0 \
 		"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 40 20 0 \
 2>&1 1>&3)
 exec 3>&-
@@ -67,7 +67,7 @@ echo 'echo " version: 2" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/b
 echo 'netplan apply' >> /srv/iff/bin/access/p1/setupnetwork.sh
 echo 'ssh-keygen -A' >> /srv/iff/bin/access/p1/setupnetwork.sh
 echo 'rm /etc/ssh/sshd_config.d/60-cloudimg-settings.conf' >> /srv/iff/bin/access/p1/setupnetwork.sh
-echo 'adduser isil' >> /srv/iff/bin/access/p1/setupnetwork.sh
+echo 'adduser isc' >> /srv/iff/bin/access/p1/setupnetwork.sh
 echo 'shutdown -r' >> /srv/iff/bin/access/p1/setupnetwork.sh
 echo "---" > /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
 echo "# defaults file for kvm_provision" >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
@@ -75,7 +75,7 @@ echo "base_image_name: jammy-server-cloudimg-amd64.img" >> /srv/iff/bin/access/p
 echo "base_image_url: https://cloud-images.ubuntu.com/jammy/current/{{ base_image_name }}" >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
 echo "base_image_sha: 0ba0fd632a90d981625d842abf18453d5bf3fd7bb64e6dd61809794c6749e18b" >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
 echo 'libvirt_pool_dir: "/var/lib/libvirt/images"' >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
-echo "vm_name: VMISIL" >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
+echo "vm_name: VMACCESS" >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
 echo "vm_vcpus: 2" >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
 echo "vm_ram_mb: $guestram" >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml
 echo "vm_net: default" >> /srv/iff/bin/access/p1/roles/kvm_provision/defaults/main.yml

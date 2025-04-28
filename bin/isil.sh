@@ -1,6 +1,12 @@
 #!/bin/bash
 function networkconfig {
 	dialog --title "INSTALLATION VM ISIL" --msgbox "Le programme va maintenant vous demander les informations de configuration réseau." 7 60
+
+function networkconfig {
+	dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Le programme va maintenant afficher les interfaces réseau de votre machine.\nMerci de bien vouloir noter le nom de celle qui doit être utilisée pour le serveur." 9 60
+	ip a
+	read -n 1 -s -r -p "Appuyez sur n'importe quelle touche pour continuer..."
+	interface="eno1"
 	ipaddress="192.168.1.100"
 	gatewayaddress="192.168.1.1"
 	masklength="24"
@@ -9,19 +15,21 @@ function networkconfig {
 			--title "CONFIGURATION RESEAU" \
 			--form "Entrez la configuration réseau de la VM ISIL :" \
 	15 80 0 \
-			"Adresse IPv4 serveur :"	1 1	"$ipaddress" 		1 40 20 0 \
-			"Passerelle par défaut IPv4 :"   					2 1	"$gatewayaddress"  		2 40 20 0 \
-			"Longueur Masque (1-32) :"   			3 1	"$masklength"  	3 40 20 0 \
+			"Nom de l interface ethernet utilisée :"	1 1	"$interface" 		1 40 20 0 \
+			"Adresse IPv4 serveur :"   					2 1	"$ipaddress"  		2 40 20 0 \
+			"Passerelle par défaut IPv4 :"   			3 1	"$gatewayaddress"  	3 40 20 0 \
+			"Longueur Masque (1-32) :"					4 1	"$masklength" 		4 40 20 0 \
 	2>&1 1>&3)
 	exec 3>&-
 	IFS=$'\n'; ipcfgarray=($ipcfg); unset IFS;
 
-	dialog --title "CONFIGURATION RESEAU"  --yesno "Cette configuration est-elle correcte ?\n\nAdresse IPv4 serveur : ${ipcfgarray[0]}\nPasserelle par défaut IPv4 : ${ipcfgarray[1]}\nLongueur Masque (1-32) : ${ipcfgarray[2]}" 10 60
+	dialog --title "CONFIGURATION RESEAU"  --yesno "Cette configuration est-elle correcte ?\n \nNom de l interface ethernet utilisée : ${ipcfgarray[0]}\nAdresse IPv4 serveur : ${ipcfgarray[1]}\nPasserelle par défaut IPv4 : ${ipcfgarray[2]}\nLongueur Masque (1-32) : ${ipcfgarray[3]}" 10 60
 	status=$?
 
-	ipaddress=${ipcfgarray[0]}
-	gatewayaddress=${ipcfgarray[1]}
-	masklength=${ipcfgarray[2]}
+	interface=${ipcfgarray[0]}
+	ipaddress=${ipcfgarray[1]}
+	gatewayaddress=${ipcfgarray[2]}
+	masklength=${ipcfgarray[3]}
 }
 networkconfig
 if [ $status -eq 1 ] ; then
@@ -31,23 +39,38 @@ if [ $status -eq 255 ] ; then
 	exit 255
 fi
 
-passwd=""
-guestsize=200
-guestram=4096
-exec 3>&1
-vmcfg=$(dialog --ok-label "Continuer" \
-		--title "CONFIGURATION DE LINUX" \
-		--form "Entrez la configuration réseau de la VM ISIL :" \
-15 80 0 \
-		"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 40 20 0 \
-		"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 40 20 0 \
-		"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 40 20 0 \
-2>&1 1>&3)
-exec 3>&-
-IFS=$'\n'; vmcfgarray=($vmcfg); unset IFS;
-guestram=${vmcfgarray[1]}
-guestsize=${vmcfgarray[0]}
-guestpwd=${vmcfgarray[2]}
+function vmhardcconfig {
+	passwd=""
+	guestsize=200
+	guestram=4096
+	guestlocation="/var/lib/libvirt/images"
+	exec 3>&1
+	vmcfg=$(dialog --ok-label "Continuer" \
+			--title "CONFIGURATION DE LINUX" \
+			--form "Entrez la configuration réseau de la VM ISIL :" \
+	15 80 0 \
+			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 40 20 0 \
+			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 40 20 0 \
+			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 40 20 0 \
+			"Emplacement de la VM ISIL :"   			4 1	"$guestlocation"  	4 40 20 0 \
+	2>&1 1>&3)
+	exec 3>&-
+	IFS=$'\n'; vmcfgarray=($vmcfg); unset IFS;
+	guestram=${vmcfgarray[1]}
+	guestsize=${vmcfgarray[0]}
+	guestpwd=${vmcfgarray[2]}
+	guestlocation=${vmcfgarray[3]}
+	dialog --title "CONFIGURATION RESEAU"  --yesno "Cette configuration est-elle correcte ?\n \nTaille de la VM ISIL en Go : ${vmcfgarray[0]}\nTaille de la mémoire de la VM ISIL en Mo : ${vmcfgarray[1]}\nMot de passe root de la machine virtuelle : ${vmcfgarray[2]}\nEmplacement de la VM ISIL : ${vmcfgarray[3]}" 10 60
+	status=$?
+}
+
+if [ $status -eq 1 ] ; then
+	vmhardcconfig
+fi
+if [ $status -eq 255 ] ; then
+	exit 255
+fi
+
 echo "CONFIGURATION RESEAU INVITE EN COURS..."
 sed -i 's/ram_mb: 2048/ram_mb: '$guestram'/g' /srv/iff/bin/isil/p1/kvm_provision.yaml
 echo 'echo "CONFIGURATION RESEAU EN COURS..."' > /srv/iff/bin/isil/p1/setupnetwork.sh
@@ -74,7 +97,7 @@ echo "# defaults file for kvm_provision" >> /srv/iff/bin/isil/p1/roles/kvm_provi
 echo "base_image_name: jammy-server-cloudimg-amd64.img" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
 echo "base_image_url: https://cloud-images.ubuntu.com/jammy/current/{{ base_image_name }}" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
 echo "base_image_sha: 0ba0fd632a90d981625d842abf18453d5bf3fd7bb64e6dd61809794c6749e18b" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
-echo 'libvirt_pool_dir: "/var/lib/libvirt/images"' >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
+echo 'libvirt_pool_dir: "'$guestlocation'"' >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
 echo "vm_name: VMISIL" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
 echo "vm_vcpus: 2" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
 echo "vm_ram_mb: $guestram" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml

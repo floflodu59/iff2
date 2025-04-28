@@ -28,18 +28,22 @@
     - name: Install Desktop
       apt: name=ubuntu-desktop      state=present update_cache=true
 
-    - name: Download TeamViever
-      ansible.builtin.command:
-        cmd: wget https://dl.teamviewer.com/download/linux/version_15x/teamviewer_15.64.3_amd64.deb /srv
-
-    - name: Install TeamViewer
-      ansible.builtin.command:
-        cmd: apt install /srv/teamviewer_15.64.3_amd64.deb
-
     - name: Install upgrades
       ansible.builtin.command:
-        cmd: apt upgrade
+        cmd: apt upgrade -y
+
+    - name: Reboot
+      ansible.builtin.reboot:
+        reboot_timeout: 120
 
     - name: Upgrade to newest
       ansible.builtin.command:
         cmd: do-release-upgrade -f DistUpgradeViewNonInteractive
+
+    - name: Reboot
+      ansible.builtin.reboot:
+        reboot_timeout: 120
+
+    - name: Update APT
+      ansible.builtin.command:
+        cmd: apt update -y
