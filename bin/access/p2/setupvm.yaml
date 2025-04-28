@@ -40,7 +40,6 @@
       ansible.builtin.command:
         cmd: apt upgrade
 
-
     - name: Upgrade to newest
       ansible.builtin.command:
         cmd: do-release-upgrade -f DistUpgradeViewNonInteractive
