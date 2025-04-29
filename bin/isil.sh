@@ -48,7 +48,7 @@ function vmhardcconfig {
 	vmcfg=$(dialog --ok-label "Continuer" \
 			--title "CONFIGURATION DE LINUX" \
 			--form "Entrez la configuration réseau de la VM ISIL :" \
-	15 80 0 \
+	25 80 0 \
 			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 40 20 0 \
 			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 40 20 0 \
 			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 40 20 0 \
