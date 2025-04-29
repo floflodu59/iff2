@@ -1,6 +1,6 @@
 #!/bin/bash
-function networkconfig {
-	dialog --title "INSTALLATION VM ISIL" --msgbox "Le programme va maintenant vous demander les informations de configuration réseau." 7 60
+
+dialog --title "INSTALLATION VM ISIL" --msgbox "Le programme va maintenant vous demander les informations de configuration réseau." 7 60
 
 function networkconfig {
 	dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Le programme va maintenant afficher les interfaces réseau de votre machine.\nMerci de bien vouloir noter le nom de celle qui doit être utilisée pour le serveur." 9 60
@@ -15,10 +15,9 @@ function networkconfig {
 			--title "CONFIGURATION RESEAU" \
 			--form "Entrez la configuration réseau de la VM ISIL :" \
 	15 80 0 \
-			"Nom de l interface ethernet utilisée :"	1 1	"$interface" 		1 40 20 0 \
-			"Adresse IPv4 serveur :"   					2 1	"$ipaddress"  		2 40 20 0 \
-			"Passerelle par défaut IPv4 :"   			3 1	"$gatewayaddress"  	3 40 20 0 \
-			"Longueur Masque (1-32) :"					4 1	"$masklength" 		4 40 20 0 \
+			"Adresse IPv4 serveur :"   					2 1	"$ipaddress"  		1 40 20 0 \
+			"Passerelle par défaut IPv4 :"   			3 1	"$gatewayaddress"  	2 40 20 0 \
+			"Longueur Masque (1-32) :"					4 1	"$masklength" 		3 40 20 0 \
 	2>&1 1>&3)
 	exec 3>&-
 	IFS=$'\n'; ipcfgarray=($ipcfg); unset IFS;
@@ -26,10 +25,9 @@ function networkconfig {
 	dialog --title "CONFIGURATION RESEAU"  --yesno "Cette configuration est-elle correcte ?\n \nNom de l interface ethernet utilisée : ${ipcfgarray[0]}\nAdresse IPv4 serveur : ${ipcfgarray[1]}\nPasserelle par défaut IPv4 : ${ipcfgarray[2]}\nLongueur Masque (1-32) : ${ipcfgarray[3]}" 10 60
 	status=$?
 
-	interface=${ipcfgarray[0]}
-	ipaddress=${ipcfgarray[1]}
-	gatewayaddress=${ipcfgarray[2]}
-	masklength=${ipcfgarray[3]}
+	ipaddress=${ipcfgarray[0]}
+	gatewayaddress=${ipcfgarray[1]}
+	masklength=${ipcfgarray[2]}
 }
 networkconfig
 if [ $status -eq 1 ] ; then
@@ -48,7 +46,7 @@ function vmhardcconfig {
 	vmcfg=$(dialog --ok-label "Continuer" \
 			--title "CONFIGURATION DE LINUX" \
 			--form "Entrez la configuration réseau de la VM ISIL :" \
-	25 80 0 \
+	15 80 0 \
 			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 40 20 0 \
 			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 40 20 0 \
 			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 40 20 0 \
@@ -64,6 +62,7 @@ function vmhardcconfig {
 	status=$?
 }
 
+vmhardcconfig
 if [ $status -eq 1 ] ; then
 	vmhardcconfig
 fi
