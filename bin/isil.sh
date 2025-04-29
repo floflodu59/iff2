@@ -47,10 +47,10 @@ function vmhardcconfig {
 			--title "CONFIGURATION DE LINUX" \
 			--form "Entrez la configuration réseau de la VM ISIL :" \
 	15 80 0 \
-			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 40 20 0 \
-			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 40 20 0 \
-			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 40 20 0 \
-			"Emplacement de la VM ISIL :"   			4 1	"$guestlocation"  	4 40 20 0 \
+			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 60 20 0 \
+			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 60 20 0 \
+			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 60 20 0 \
+			"Emplacement de la VM ISIL :"   			4 1	"$guestlocation"  	4 60 20 0 \
 	2>&1 1>&3)
 	exec 3>&-
 	IFS=$'\n'; vmcfgarray=($vmcfg); unset IFS;
@@ -71,6 +71,7 @@ if [ $status -eq 255 ] ; then
 fi
 
 echo "CONFIGURATION RESEAU INVITE EN COURS..."
+sed -i 's/pool_dir: "/var/lib/libvirt/images"/pool_dir: '$guestlocation'/g' /srv/iff/bin/isil/p1/kvm_provision.yaml
 sed -i 's/ram_mb: 2048/ram_mb: '$guestram'/g' /srv/iff/bin/isil/p1/kvm_provision.yaml
 echo 'echo "CONFIGURATION RESEAU EN COURS..."' > /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'echo "# This is an automatically generated network config file by the IFF project." > /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/isil/p1/setupnetwork.sh

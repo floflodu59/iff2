@@ -2,10 +2,8 @@
 # IFF - Script de configuration hôte
 # Todo :
 # --Outils pour cas spéciaux (changement IP, configuration sauvegarde)
-# --Reassignation VM sur disque différent
 # --Maj auto du script de sauvegarde
-# --Deploiment VM access
-# --
+# --Log d'installation
 echo "INSTALLATION DE DIALOG"
 echo "======================"
 apt-get update

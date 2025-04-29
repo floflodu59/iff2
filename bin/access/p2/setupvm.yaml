@@ -39,11 +39,3 @@
     - name: Upgrade to newest
       ansible.builtin.command:
         cmd: do-release-upgrade -f DistUpgradeViewNonInteractive
-
-    - name: Reboot
-      ansible.builtin.reboot:
-        reboot_timeout: 120
-
-    - name: Update APT
-      ansible.builtin.command:
-        cmd: apt update -y
