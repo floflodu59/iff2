@@ -3,9 +3,6 @@
 dialog --title "INSTALLATION VM ISIL" --msgbox "Le programme va maintenant vous demander les informations de configuration réseau." 7 60
 
 function networkconfig {
-	dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Le programme va maintenant afficher les interfaces réseau de votre machine.\nMerci de bien vouloir noter le nom de celle qui doit être utilisée pour le serveur." 9 60
-	ip a
-	read -n 1 -s -r -p "Appuyez sur n'importe quelle touche pour continuer..."
 	interface="eno1"
 	ipaddress="192.168.1.100"
 	gatewayaddress="192.168.1.1"
@@ -15,14 +12,14 @@ function networkconfig {
 			--title "CONFIGURATION RESEAU" \
 			--form "Entrez la configuration réseau de la VM ISIL :" \
 	15 80 0 \
-			"Adresse IPv4 serveur :"   					2 1	"$ipaddress"  		1 40 20 0 \
-			"Passerelle par défaut IPv4 :"   			3 1	"$gatewayaddress"  	2 40 20 0 \
-			"Longueur Masque (1-32) :"					4 1	"$masklength" 		3 40 20 0 \
+			"Adresse IPv4 serveur :"   					1 1	"$ipaddress"  		1 40 20 0 \
+			"Passerelle par défaut IPv4 :"   			2 1	"$gatewayaddress"  	2 40 20 0 \
+			"Longueur Masque (1-32) :"					3 1	"$masklength" 		3 40 20 0 \
 	2>&1 1>&3)
 	exec 3>&-
 	IFS=$'\n'; ipcfgarray=($ipcfg); unset IFS;
 
-	dialog --title "CONFIGURATION RESEAU"  --yesno "Cette configuration est-elle correcte ?\n \nNom de l interface ethernet utilisée : ${ipcfgarray[0]}\nAdresse IPv4 serveur : ${ipcfgarray[1]}\nPasserelle par défaut IPv4 : ${ipcfgarray[2]}\nLongueur Masque (1-32) : ${ipcfgarray[3]}" 10 60
+	dialog --title "CONFIGURATION RESEAU"  --yesno "Cette configuration est-elle correcte ?\n \nNom de l interface ethernet utilisée : ${ipcfgarray[0]}\nAdresse IPv4 serveur : ${ipcfgarray[1]}\nLongueur Masque (1-32) : ${ipcfgarray[2]}" 10 60
 	status=$?
 
 	ipaddress=${ipcfgarray[0]}
@@ -47,15 +44,15 @@ function vmhardcconfig {
 			--title "CONFIGURATION DE LINUX" \
 			--form "Entrez la configuration réseau de la VM ISIL :" \
 	15 80 0 \
-			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 60 20 0 \
-			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 60 20 0 \
-			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 60 20 0 \
-			"Emplacement de la VM ISIL :"   			4 1	"$guestlocation"  	4 60 20 0 \
+			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 40 40 0 \
+			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 40 40 0 \
+			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 40 40 0 \
+			"Emplacement de la VM ISIL :"   			4 1	"$guestlocation"  	4 40 40 0 \
 	2>&1 1>&3)
 	exec 3>&-
 	IFS=$'\n'; vmcfgarray=($vmcfg); unset IFS;
-	guestram=${vmcfgarray[1]}
 	guestsize=${vmcfgarray[0]}
+	guestram=${vmcfgarray[1]}
 	guestpwd=${vmcfgarray[2]}
 	guestlocation=${vmcfgarray[3]}
 	dialog --title "CONFIGURATION RESEAU"  --yesno "Cette configuration est-elle correcte ?\n \nTaille de la VM ISIL en Go : ${vmcfgarray[0]}\nTaille de la mémoire de la VM ISIL en Mo : ${vmcfgarray[1]}\nMot de passe root de la machine virtuelle : ${vmcfgarray[2]}\nEmplacement de la VM ISIL : ${vmcfgarray[3]}" 10 60
