@@ -7,7 +7,7 @@
 #Créer un fichier .psswd2 avec le mot de passe de chiffrement de la sauvegarde.
 #sudo apt install ssmtp
 #Il est nécessaire d'installer et configurer ssmtp pour ce script.
-#Après l'execution du cron job ajouter un autre job "ssmtp [e-mail expediteur] < /backup/script/sendmail
+#Après l'execution du cron job ajouter un autre job "ssmtp [[e-mail expediteur]] < /backup/script/sendmail
 #
 
 #====FUNCTION VARIABLES====
@@ -29,15 +29,12 @@ vmcheck=false
 uploadcheck=false
 uploadpartial=false
 stamp=$(date +"%Y%m%d")
-#====MAILING====
-sender="" #Expediteur du mail
-recipients=""
-site="" #Apparait dans le sujet du mail : "[SUJET][SITE] Info"
-sujet="" #Apparait dans le sujet du mail : "[SUJET][SITE] Info"
 #====OTHER====
 sqluser="postgres" #Changer ici utilisateur SQL
 vmarrayfile="/backup/scripts/vmlist"
 vmlist=$(cat $vmarrayfile)
+destinationsfile="/backup/scripts/destinations"
+destinationslist=$(cat $destinationsfile)
 
 
 #Codes d'etat :
@@ -50,158 +47,224 @@ vmlist=$(cat $vmarrayfile)
 
 echo "${stamp}${status}" > /backup/scripts/status
 
+function refreshdate
+{
+current_date=$(date +"%Y%m%d-%H%M%S")
+precistetime=$(date +"%H:%M:%S")
+}
+
 function starthistory
 {
+	refreshdate
 	rm /backup/latest.log
-	echo "${current_date}-$(precistetime) - Démarrage de la sauvegarde." > /backup/latest.log
-	echo "${current_date}-$(precistetime) - Mode de sauvegarde = ${executionmode}." >> /backup/latest.log
-	if [ $executionmode -eq 0 ] ; then 
-		echo "${current_date}-$(precistetime) - Sauvegarde de la base de données uniquement." >> /backup/latest.log
+	echo "${current_date}-${precisetime} Démarrage de la sauvegarde." > /backup/latest.log
+	echo "${current_date}-${precisetime} Mode de sauvegarde = ${executionmode}." >> /backup/latest.log
+	if [[ $executionmode -eq 0 ]] ; then 
+		echo "${current_date}-${precisetime} Sauvegarde de la base de données uniquement." >> /backup/latest.log
 	fi
-	if [ $executionmode -eq 1 ] ; then 
-		echo "${current_date}-$(precistetime) - Sauvegarde de la BDD + sauvegarde partielle du dossier uploads." >> /backup/latest.log
+	if [[ $executionmode -eq 1 ]] ; then 
+		echo "${current_date}-${precisetime} Sauvegarde de la BDD + sauvegarde partielle du dossier uploads." >> /backup/latest.log
 	fi
-	if [ $executionmode -eq 3 ] ; then 
-		echo "${current_date}-$(precistetime) - Sauvegarde de la BDD + sauvegarde complète du dossier uploads + sauvegarde des VMs." >> /backup/latest.log
+	if [[ $executionmode -eq 2 ]] ; then 
+		echo "${current_date}-${precisetime} Sauvegarde de la BDD + sauvegarde complète du dossier uploads + sauvegarde des VMs." >> /backup/latest.log
 	fi
 	
 }
 
 function savedb
 {
-	echo "${current_date}-$(precistetime) - Sauvegarde de la base de données." >> /backup/latest.log
-	export PGPASSWORD=$(cat "$password") PGUSER=$sqluser ; pg_dump -U $sqluser isil > /backup/data/sqllatest.sql
-	echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/data/sqllatest.sql
-	rm /backup/data/sqllatest.sql
-	mkdir /backup/data/sql/$current_year
-	mkdir /backup/data/sql/$current_year/$current_month
-	mkdir /backup/data/sql/$current_year/$current_month/$current_day
-	rm -rf /backup/data/sql/$last_year/$current_month/$current_day
-	cp /backup/data/sqllatest.sql.gpg /backup/data/sql/$current_year/$current_month/$current_day/export-$current_date.sql.gpg
-	echo "${current_date}-$(precistetime) - Sauvegarde de la BDD effectuée." >> /backup/latest.log
-	echo "${current_date}-$(precistetime) - Votre sauvegarde de la BDD est disponible au chemin suivant : /backup/data/sql/${current_year}/${current_month}/${current_day}/export-${current_date}.sql.gpg" >> /backup/latest.log
+	refreshdate
+	echo "${current_date}-${precisetime} Sauvegarde de la base de données." >> /backup/latest.log
+	export PGPASSWORD=$(cat "$password") PGUSER=$sqluser ; pg_dump -U $sqluser isil > /backup/temp/sqllatest.sql
+	echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/sqllatest.sql
+	rm /backup/temp/sqllatest.sql
+	for i in "${destinationslist[@]}"
+		do
+			if [ $i -eq "local" ] ; then
+				mkdir /backup/data/sql/$current_year
+				mkdir /backup/data/sql/$current_year/$current_month
+				mkdir /backup/data/sql/$current_year/$current_month/$current_day
+				rm -rf /backup/data/sql/$last_year/$current_month/$current_day
+				cp /backup/temp/sqllatest.sql.gpg /backup/data/sql/$current_year/$current_month/$current_day/export-$current_date.sql.gpg
+			fi
+			if [ $i -eq "remote" ] ; then
+				mkdir /backup/remotedata/sql/$current_year
+				mkdir /backup/remotedata/sql/$current_year/$current_month
+				mkdir /backup/remotedata/sql/$current_year/$current_month/$current_day
+				rm -rf /backup/remotedata/sql/$last_year/$current_month/$current_day
+				cp /backup/temp/sqllatest.sql.gpg /backup/remotedata/sql/$current_year/$current_month/$current_day/export-$current_date.sql.gpg
+			fi
+		done
+	refreshdate
+	echo "${current_date}-${precisetime} Sauvegarde de la BDD effectuée." >> /backup/latest.log
+	echo "${current_date}-${precisetime} Votre sauvegarde de la BDD est disponible au chemin suivant : /backup/data/sql/${current_year}/${current_month}/${current_day}/export-${current_date}.sql.gpg" >> /backup/latest.log
  	dbcheck=true
 	#echo "${stamp}${status}" > /backup/scripts/status
 }
 
 function fullsave
 {
-	echo "${current_date}-$(precistetime) - Démarrage de la sauvegarde du dossier uploads." >> /backup/latest.log
+	refreshdate
+	echo "${current_date}-${precisetime} Démarrage de la sauvegarde du dossier uploads." >> /backup/latest.log
 	rm -rf /backup/temp/uploads
 	cp -r /backup/uploads/ /backup/temp/
 	tar -zcvf /backup/temp/uploads.tar.gz /backup/temp/uploads/
 	echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/uploads.tar.gz
-	mkdir /backup/data/uploads/$current_year
-	mkdir /backup/data/uploads/$current_year/$current_month
-	mkdir /backup/data/uploads/$current_year/$current_month/$current_day
-	cp /backup/temp/uploads.tar.gz.gpg /backup/data/uploads/$current_year/$current_month/$current_day/uploads-full-$current_date.tar.gz.gpg
-	mv /backup/temp/uploads.tar.gz.gpg /backup/data/uploads/uploads-full-latest.tar.gz.gpg
+	for i in "${destinationslist[@]}"
+		do
+			if [ $i -eq "local" ] ; then
+				mkdir /backup/data/uploads/$current_year
+				mkdir /backup/data/uploads/$current_year/$current_month
+				mkdir /backup/data/uploads/$current_year/$current_month/$current_day
+				cp /backup/temp/uploads.tar.gz.gpg /backup/data/uploads/$current_year/$current_month/$current_day/uploads-full-$current_date.tar.gz.gpg
+				cp /backup/temp/uploads.tar.gz.gpg /backup/data/uploads/uploads-full-latest.tar.gz.gpg
+			fi
+			if [ $i -eq "remote" ] ; then
+				mkdir /backup/remotedata/uploads/$current_year
+				mkdir /backup/remotedata/uploads/$current_year/$current_month
+				mkdir /backup/remotedata/uploads/$current_year/$current_month/$current_day
+				cp /backup/temp/uploads.tar.gz.gpg /backup/remotedata/uploads/$current_year/$current_month/$current_day/uploads-full-$current_date.tar.gz.gpg
+				cp /backup/temp/uploads.tar.gz.gpg /backup/remotedata/uploads/uploads-full-latest.tar.gz.gpg
+			fi
+		done
+	rm /backup/temp/uploads.tar.gz.gpg
 	rm /backup/temp/uploads.tar.gz
-	echo "${current_date}-$(precistetime) - Sauvegarde du dossier uploads effectuée." >> /backup/latest.log
-	echo "${current_date}-$(precistetime) - Votre sauvegarde du dossier uploads est disponible au chemin suivant : /backup/data/uploads/${current_year}/${current_month}/${current_day}/uploads-full-${current_date}.sql.gpg" >> /backup/latest.log
+	refreshdate
+	echo "${current_date}-${precisetime} Sauvegarde du dossier uploads effectuée." >> /backup/latest.log
+	echo "${current_date}-${precisetime} Votre sauvegarde du dossier uploads est disponible au chemin suivant : /backup/data/uploads/${current_year}/${current_month}/${current_day}/uploads-full-${current_date}.sql.gpg" >> /backup/latest.log
 	uploadcheck=true
 }
 
 function saveuploads
 {
-	#if [ $current_day -eq 1 ] ; then
+	refreshdate
+	#if [[ $current_day -eq 1 ]] ; then
 	#	fullsave
 	#fi
-	if [ $executionmode -eq 1 ] ; then
-		echo "${current_date}-$(precistetime) - Démarrage de la sauvegarde du dossier uploads." >> /backup/latest.log
+	if [[ $executionmode -eq 1 ]] ; then
+		echo "${current_date}-${precisetime} Démarrage de la sauvegarde du dossier uploads." >> /backup/latest.log
 		rm -rf /backup/temp/copy
 		mkdir /backup/temp/copy
 		find /backup/uploads -mtime -2 -type f -exec cp "{}" /backup/temp/copy \;
 		tar -zcvf /backup/temp/uploads-incremental.tar.gz /backup/temp/copy/
 		echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/uploads-incremental.tar.gz
-		cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/data/uploads/$current_year/$current_month/$current_day/uploads-incremental-$current_date.tar.gz.gpg
-		mv /backup/temp/uploads-incremental.tar.gz.gpg /backup/data/uploads/uploads-incremental-latest.tar.gz.gpg
+		for i in "${destinationslist[@]}"
+		do
+			if [ $i -eq "local" ] ; then
+				cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/data/uploads/$current_year/$current_month/$current_day/uploads-incremental-$current_date.tar.gz.gpg
+				cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/data/uploads/uploads-incremental-latest.tar.gz.gpg
+			fi
+			if [ $i -eq "remote" ] ; then
+				cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/remotedata/uploads/$current_year/$current_month/$current_day/uploads-incremental-$current_date.tar.gz.gpg
+				cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/remotedata/uploads/uploads-incremental-latest.tar.gz.gpg
+			fi
+		done
+		rm /backup/temp/uploads-incremental.tar.gz.gpg 
 		rm /backup/temp/uploads-incremental.tar.gz
-		echo "${current_date}-$(precistetime) - Sauvegarde des uploads effectuée." >> /backup/latest.log
-		echo "${current_date}-$(precistetime) - Votre sauvegarde des uploads est disponible au chemin suivant : /backup/data/uploads/${current_year}/${current_month}/${current_day}/uploads-incremental-${current_date}.sql.gpg" >> /backup/latest.log
+		refreshdate
+		echo "${current_date}-${precisetime} Sauvegarde des uploads effectuée." >> /backup/latest.log
+		echo "${current_date}-${precisetime} Votre sauvegarde des uploads est disponible au chemin suivant : /backup/data/uploads/${current_year}/${current_month}/${current_day}/uploads-incremental-${current_date}.sql.gpg" >> /backup/latest.log
 		uploadcheck=true
 		uploadpartial=true
  	fi
-	if [ $executionmode -eq 2 ] ; then 
+	if [[ $executionmode -eq 2 ]] ; then 
 		fullsave
 	fi
 }
 
 function savevms
 {
-	if [ $executionmode -eq 2 ] ; then
-		echo "${current_date}-$(precistetime) - Sauvegarde des machines virtuelles." >> /backup/latest.log
+	refreshdate
+	if [[ $executionmode -eq 2 ]] ; then
+		echo "${current_date}-${precisetime} Sauvegarde des machines virtuelles." >> /backup/latest.log
 		for i in "${vmlist[@]}"
 		do
 			echo "$i"
-			echo "${current_date}-$(precistetime) - Sauvegarde de la machine virtuelle ${i}." >> /backup/latest.log
+			refreshdate
+			echo "${current_date}-${precisetime} Sauvegarde de la machine virtuelle ${i}." >> /backup/latest.log
 			virsh snapshot-delete $i latest
 			virsh snapshot-create-as $i latest
-			mkdir /backup/data/vm/$i
-			cp /var/lib/libvirt/images/$i.qcow2 /backup/data/vm/$i/latest.qcow2
-			echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/data/vm/$i/latest.qcow2
-			rm /backup/data/vm/$i/latest.qcow2
-			virsh dumpxml $i >> /backup/data/vm/$i/latestconfig.xml
-			echo "${current_date}-$(precistetime) - Sauvegarde de la machine virtuelle ${i} complétée." >> /backup/latest.log
-			echo "${current_date}-$(precistetime) - La sauvegarde de ${i} est disponible au chemin suivant : /backup/data/vm/${i}/latest.qcow2.gpg avec son fichier de configuration latestconfig.xml" >> /backup/latest.log
+			cp /var/lib/libvirt/images/$i.qcow2 /backup/temp/latest.qcow2
+			echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/latest.qcow2
+			for i in "${destinationslist[@]}"
+			do
+				if [ $i -eq "local" ] ; then
+					mkdir /backup/data/vm/$i
+					cp /backup/temp/latest.qcow2.gpg /backup/data/vm/$i/latest.qcow2.gpg
+					virsh dumpxml $i >> /backup/data/vm/$i/latestconfig.xml
+				fi
+				if [ $i -eq "remote" ] ; then
+					mkdir /backup/remotedata/vm/$i
+					cp /backup/temp/latest.qcow2.gpg /backup/remotedata/vm/$i/latest.qcow2.gpg
+					virsh dumpxml $i >> /backup/remotedata/vm/$i/latestconfig.xml
+				fi
+			done
+			rm /backup/temp/latest.qcow2
+			rm /backup/temp/latest.qcow2.gpg
+			refreshdate
+			echo "${current_date}-${precisetime} Sauvegarde de la machine virtuelle ${i} complétée." >> /backup/latest.log
+			echo "${current_date}-${precisetime} La sauvegarde de ${i} est disponible au chemin suivant : /backup/data/vm/${i}/latest.qcow2.gpg avec son fichier de configuration latestconfig.xml" >> /backup/latest.log
 		done
-  	echo "${current_date}-$(precistetime) - Sauvegarde des machines virtuelles complétée." >> /backup/latest.log
+  	refreshdate
+	echo "${current_date}-${precisetime} Sauvegarde des machines virtuelles complétée." >> /backup/latest.log
 	fi
  	vmcheck=true
 }
 
 function errorhandler
 {
-	echo "${current_date}-$(precistetime) - Vérification des erreurs." >> /backup/latest.log
+	refreshdate
+	echo "${current_date}-${precisetime} Vérification des erreurs." >> /backup/latest.log
 	#echo "${status}"
-	if [ $executionmode -eq 0 ] ; then
-  		if [ $dbcheck = true ] ; then
+	if [[ $executionmode -eq 0 ]] ; then
+  		if [[ $dbcheck = true ]] ; then
 			status=1
-			echo "${current_date}-$(precistetime) - Vérification complète, tout est OK." >> /backup/latest.log
+			echo "${current_date}-${precisetime} Vérification complète, tout est OK." >> /backup/latest.log
   		fi
   	fi
- 	if [ $executionmode -eq 1 ] ; then
-  		if [ $dbcheck = true ] ; then
-			if [ $uploadcheck = true ] ; then
+ 	if [[ $executionmode -eq 1 ]] ; then
+  		if [[ $dbcheck = true ]] ; then
+			if [[ $uploadcheck = true ]] ; then
 				status=1
-				echo "${current_date}-$(precistetime) - Vérification complète, tout est OK." >> /backup/latest.log
+				echo "${current_date}-${precisetime} Vérification complète, tout est OK." >> /backup/latest.log
   			fi
   		fi
-		if [ $uploadcheck = false ] ; then
-			echo "${current_date}-$(precistetime) - ERREUR - Erreur de sauvegarde du dossier uploads" >> /backup/latest.log
+		if [[ $uploadcheck = false ]] ; then
+			echo "${current_date}-${precisetime} ERREUR - Erreur de sauvegarde du dossier uploads" >> /backup/latest.log
 			status=2
 		fi
   	fi
-   	if [ $executionmode -eq 2 ] ; then
-  		if [ $dbcheck = true ] ; then
-			if [ $uploadcheck = true ] ; then
-				if [ $vmcheck = true ] ; then
+   	if [[ $executionmode -eq 2 ]] ; then
+  		if [[ $dbcheck = true ]] ; then
+			if [[ $uploadcheck = true ]] ; then
+				if [[ $vmcheck = true ]] ; then
 					status=1
-					echo "${current_date}-$(precistetime) - Vérification complète, tout est OK." >> /backup/latest.log
+					echo "${current_date}-${precisetime} Vérification complète, tout est OK." >> /backup/latest.log
   				fi
   			fi
   		fi
-		if [ $vmcheck = false ] ; then
-			echo "${current_date}-$(precistetime) - ERREUR - Erreur de sauvegarde des machines virtuelles" >> /backup/latest.log
+		if [[ $vmcheck = false ]] ; then
+			echo "${current_date}-${precisetime} ERREUR - Erreur de sauvegarde des machines virtuelles" >> /backup/latest.log
    			status=2
   		fi
 	fi
- 	if [ $dbcheck = false ] ; then
-		echo "${current_date}-$(precistetime) - ERREUR - Erreur de sauvegarde de la base de donnees" >> /backup/latest.log
+ 	if [[ $dbcheck = false ]] ; then
+		echo "${current_date}-${precisetime} ERREUR - Erreur de sauvegarde de la base de donnees" >> /backup/latest.log
   		status=2
   	fi
    	
-   	if [ $executionmode -eq 2 ] ; then
-   		if [ $vmcheck = false ] ; then
-			echo "${current_date}-$(precistetime) - ERREUR - Erreur de sauvegarde des machines virtuelles" >> /backup/latest.log
+   	if [[ $executionmode -eq 2 ]] ; then
+   		if [[ $vmcheck = false ]] ; then
+			echo "${current_date}-${precisetime} ERREUR - Erreur de sauvegarde des machines virtuelles" >> /backup/latest.log
    			status=2
   		fi
     	fi
 	status="${stamp}""${status}"
 	echo $status
-	if [ $status = false ] ; then
-		echo "${current_date}-$(precistetime) - ERREUR DE SAUVEGARDE GENERALE" >> /backup/latest.log
+	if [[ $status = false ]] ; then
+		echo "${current_date}-${precisetime} ERREUR DE SAUVEGARDE GENERALE" >> /backup/latest.log
 	fi
+	refreshdate
 	echo $status > /backup/scripts/status
 	echo $dbcheck > /backup/scripts/dbcheck
 	echo $uploadcheck > /backup/scripts/uploadcheck
@@ -211,7 +274,11 @@ function errorhandler
 
 
 starthistory
+refreshdate
 savedb
+refreshdate
 saveuploads
+refreshdate
 savevms
+refreshdate
 errorhandler

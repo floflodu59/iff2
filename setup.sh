@@ -11,7 +11,7 @@ apt-get install dialog
 mkdir /srv/iff/tmp
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Ce programme permet d'installer les outils de virtualisation pour les déploiments ISIL.\n\nMerci de bien suivre la documentation associée afin de pouvoir completer cette installation avec succès." 10 60
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Le programme va maintenant installer les prérequis." 6 60
-apt-get install dos2unix ansible cockpit cockpit-pcp qemu qemu-kvm bridge-utils cpu-checker libvirt-clients libvirt-daemon postgresql cockpit-machines cloud-image-utils ssmtp -y
+apt-get install dos2unix ansible cockpit cockpit-pcp qemu qemu-kvm bridge-utils cpu-checker libvirt-clients libvirt-daemon postgresql cockpit-machines cloud-image-utils ssmtp nfs-kernel-server nfs-common -y
 function networkconfig {
 	dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Le programme va maintenant afficher les interfaces réseau de votre machine.\nMerci de bien vouloir noter le nom de celle qui doit être utilisée pour le serveur." 9 60
 	ip a
@@ -48,7 +48,6 @@ fi
 if [ $status -eq 255 ] ; then
 	exit 255
 fi
-
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Le programme va maintenant effectuer la configuration réseau." 6 60
 echo "CONFIGURATION RESEAU EN COURS..."
 rm -rf /etc/netplan/*
@@ -118,5 +117,10 @@ do
 	fi
 	if [ $i -eq 3 ] ; then
 		echo "Mise en place de la sauvegarde..."
+		echo $dbpassword > /srv/iff/bin/backup/scripts/.psswd
+		dos2unix /srv/iff/bin/backup.sh
+		chmod u+x /srv/iff/bin/backup.sh
+		/srv/iff/bin/backup.sh
+		
 	fi
 done
