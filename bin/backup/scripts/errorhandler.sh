@@ -38,6 +38,13 @@ function endhistory
 	cat /backup/latest.log >> /backup/history.log
 }
 
+function insertheader
+{
+	echo "<style>" >>/backup/scripts/sendmail
+	echo "p { margin: 0px; padding: 0px; }" >>/backup/scripts/sendmail
+	echo "</style>" >>/backup/scripts/sendmail
+}
+
 function sendmail
 {
 	refreshdate
@@ -46,29 +53,30 @@ function sendmail
     echo "From: ${sender}" >> /backup/scripts/sendmail
 	echo "MIME-Version: 1.0" >> /backup/scripts/sendmail
     echo "Content-Type: text/html; charset=utf-8" >> /backup/scripts/sendmail
-	echo "<style>" >>/backup/scripts/sendmail
-	echo "p { margin: 0px; padding: 0px; }" >>/backup/scripts/sendmail
-	echo "</style>" >>/backup/scripts/sendmail
 	
 	if [[ $status -eq "${stamp}0" ]] ; then
-		echo "<p>Subject: [${sujet}][${site}] ECHEC - La sauvegarde des donnees ISIL ne s'est pas effectuee.</p>" >> /backup/scripts/sendmail #Changer ici au besoin
+		echo "Subject: [${sujet}][${site}] ECHEC - La sauvegarde des donnees ISIL ne s'est pas effectuee." >> /backup/scripts/sendmail #Changer ici au besoin
+		insertheader
 		echo "<p>Bonjour,</p>" >> /backup/scripts/sendmail
 		echo "<p>La sauvegarde du serveur ISIL du site ${site} n'a pas aboutie correctement.</p>" >> /backup/scripts/sendmail #Changer ici au besoin
     fi
     if [[ $status -eq "${stamp}1" ]] ; then
-		echo "<p>Subject: [${sujet}][${site}] SUCCES - La sauvegarde des donnees ISIL s'est effectuee.</p>" >> /backup/scripts/sendmail #Changer ici au besoin
+		echo "Subject: [${sujet}][${site}] SUCCES - La sauvegarde des donnees ISIL s'est effectuee." >> /backup/scripts/sendmail #Changer ici au besoin
+		insertheader
 		echo "<p>Bonjour,</p>" >> /backup/scripts/sendmail
 		echo "<p>La sauvegarde du serveur ISIL du site ${site} s'est effectuee correctement.</p>" >> /backup/scripts/sendmail #Changer ici au besoin
     fi
 	if [[ $status -eq "${stamp}2" ]] ; then
-		echo "<p>Subject: [${sujet}][${site}] ECHEC - La sauvegarde des donnees ISIL ne s'est pas effectuee correctement.</p>" >> /backup/scripts/sendmail #Changer ici au besoin
+		echo "Subject: [${sujet}][${site}] ECHEC - La sauvegarde des donnees ISIL ne s'est pas effectuee correctement." >> /backup/scripts/sendmail #Changer ici au besoin
+		insertheader
 		echo "<p>Bonjour,</p>" >> /backup/scripts/sendmail
 		echo "<p>La sauvegarde du serveur ISIL du site ${site} n'a pas aboutie correctement en raison d'un ou plusieurs des composants de sauvegarde qui ne se sont pas execute correctement.</p>" >> /backup/scripts/sendmail
     fi
 	if [[ $status = "${stamp}5" ]] ; then
-        echo "<p>Subject: [${sujet}][${site}] ECHEC - La sauvegarde des donnees ISIL ne s'est pas effectuee.</p>" >> /backup/scripts/sendmail #Changer ici au besoin
-        echo "<p>Bonjour,</p>" >> /backup/scripts/sendmail
-        echo "<p>La sauvegarde du serveur ISIL du site ${site} n'a pas aboutie. Le script de sauvegarde ne s'est pas execute.</p>" >> /backup/scripts/sendmail #Changer ici au besoin 
+       echo "Subject: [${sujet}][${site}] ECHEC - La sauvegarde des donnees ISIL ne s'est pas effectuee." >> /backup/scripts/sendmail #Changer ici au besoin
+       insertheader
+       echo "<p>Bonjour,</p>" >> /backup/scripts/sendmail
+       echo "<p>La sauvegarde du serveur ISIL du site ${site} n'a pas aboutie. Le script de sauvegarde ne s'est pas execute.</p>" >> /backup/scripts/sendmail #Changer ici au besoin 
     fi
 	echo "<p></p>" >> /backup/scripts/sendmail
 	echo "<p>Voici le récapitulatif de la sauvegarde :</p>" >> /backup/scripts/sendmail
@@ -106,7 +114,7 @@ function sendmail
 	refreshdate
 	echo "<p>Bonne journee,</p>" >> /backup/scripts/sendmail
     echo "<p>SFF 1.0</p>" >> /backup/scripts/sendmail
-    /usr/sbin/ssmtp $sender < /backup/scripts/sendmail
+    /usr/sbin/ssmtp $recipients < /backup/scripts/sendmail
     #rm /backup/scripts/sendmail
     echo "${current_date} - Envoi du mail effectue." >> /backup/latest.log
 }

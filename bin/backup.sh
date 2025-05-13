@@ -51,9 +51,34 @@ do
 		IFS=$'\n'; remotecfgarray=($remotecfg); unset IFS;
 		remoteip=${remotecfgarray[0]}
 		remotedir=${remotecfgarray[1]}
-		echo "$remoteip:$remotedir" /backup/remotedata nfs defaults 0 0"
+		echo "$remoteip":"$remotedir" "/backup/remotedata nfs defaults 0 0"
 	fi
 	if [ $i -eq 3 ] ; then
 		echo "cloud" >> /backup/scripts/destinations
 	fi
 done
+sender="sauvegardes@example.com"
+recipient="support@example.com"
+sujet="CONTOSO"
+site="PARIS"
+exec 3>&1
+bckcfg=$(dialog --ok-label "Continuer" \
+	--title "CONFIGURATION SAUVEGARDES" \
+	--form "Entrez la configuration de la sauvegarde :" \
+15 80 0 \
+	"Adresse mail de l'envoyeur :"	1 1	"$sender" 		1 40 20 0 \
+	"Adresse mail du destinataire :"	2 1	"$recipient" 		2 40 20 0 \
+	"Nom de l'entreprise :"	3 1	"$sujet" 		3 40 20 0 \
+	"Nom du site :"	4 1	"$site" 		4 40 20 0 \
+2>&1 1>&3)
+exec 3>&-
+IFS=$'\n'; bckarray=($bckcfg); unset IFS;
+sender=${bckarray[0]}
+recipient=${bckarray[1]}
+sujet=${bckarray[2]}
+site=${bckarray[3]}
+sed -i 's/sender=""/sender="'$sender'"/g' /backup/scripts/errorhandler.sh
+sed -i 's/recipients=""/recipients="'$recipient'"/g' /backup/scripts/errorhandler.sh
+sed -i 's/site="IFF-01"/site="'$site'"/g' /backup/scripts/errorhandler.sh
+sed -i 's/sujet="ISC"/sujet="'$sujet'"/g' /backup/scripts/errorhandler.sh
+echo "VMISIL" >> /backup/scripts/vmlist

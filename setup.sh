@@ -121,6 +121,6 @@ do
 		dos2unix /srv/iff/bin/backup.sh
 		chmod u+x /srv/iff/bin/backup.sh
 		/srv/iff/bin/backup.sh
-		
 	fi
 done
+dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Installation terminée." 10 60
