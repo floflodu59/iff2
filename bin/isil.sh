@@ -43,11 +43,11 @@ function vmhardcconfig {
 	vmcfg=$(dialog --ok-label "Continuer" \
 			--title "CONFIGURATION DE LINUX" \
 			--form "Entrez la configuration réseau de la VM ISIL :" \
-	15 80 0 \
-			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 40 50 0 \
-			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 40 50 0 \
-			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 40 50 0 \
-			"Emplacement de la VM ISIL :"   			4 1	"$guestlocation"  	4 40 50 0 \
+	15 100 0 \
+			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 45 50 0 \
+			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 45 50 0 \
+			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 45 50 0 \
+			"Emplacement de la VM ISIL :"   			4 1	"$guestlocation"  	4 45 50 0 \
 	2>&1 1>&3)
 	exec 3>&-
 	IFS=$'\n'; vmcfgarray=($vmcfg); unset IFS;
@@ -88,6 +88,7 @@ echo 'netplan apply' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'ssh-keygen -A' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'rm /etc/ssh/sshd_config.d/60-cloudimg-settings.conf' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'adduser isil' >> /srv/iff/bin/isil/p1/setupnetwork.sh
+echo 'adduser isil sudo' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo 'shutdown -r' >> /srv/iff/bin/isil/p1/setupnetwork.sh
 echo "---" > /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
 echo "# defaults file for kvm_provision" >> /srv/iff/bin/isil/p1/roles/kvm_provision/defaults/main.yml
