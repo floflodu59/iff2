@@ -2,6 +2,7 @@
 
 mkdir /backup
 cp -r /srv/iff/bin/backup/* /backup/
+rm /backup/scripts/.psswd
 dos2unix /backup/scripts/export.sh
 dos2unix /backup/scripts/errorhandler.sh
 chmod u+x /backup/scripts/export.sh
@@ -22,7 +23,7 @@ chown root:root /backup/scripts/.psswd
 chown root:root /backup/scripts/.psswd2
 chmod 700 /backup/scripts/.psswd
 chmod 700 /backup/scripts/.psswd2
-dialog --checklist "Choisissez les destinations de sauvegardes:" 10 40 3 \
+dialog --checklist "Choisissez les destinations de sauvegardes:" 20 40 3 \
         1 "Local" on \
         2 "NAS ou serveur de sauvegarde" off \
         3 "Cloud" off 2>/srv/iff/tmp/checklistbck
