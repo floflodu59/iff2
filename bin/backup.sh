@@ -44,14 +44,14 @@ do
 			--title "CONFIGURATION SAUVEGARDES" \
 			--form "Entrez la configuration de la sauvegarde :" \
 		15 80 0 \
-			"Addresse IP du NAS ou serveur distant :"	1 1	"$remoteip" 		1 40 20 0 \
-			"Dossier du NAS ou serveur distant :"	2 1	"$remotedir" 		2 40 20 0 \
+			"Addresse IP du NAS ou serveur distant :"	1 1	"$remoteip" 		1 40 40 0 \
+			"Dossier du NAS ou serveur distant :"	2 1	"$remotedir" 		2 40 40 0 \
 		2>&1 1>&3)
 		exec 3>&-
 		IFS=$'\n'; remotecfgarray=($remotecfg); unset IFS;
 		remoteip=${remotecfgarray[0]}
 		remotedir=${remotecfgarray[1]}
-		echo "$remoteip":"$remotedir" "/backup/remotedata nfs defaults 0 0"
+		echo "$remoteip":"$remotedir" "/backup/remotedata nfs defaults 0 0" >> /etc/fstab
 	fi
 	if [ $i -eq 3 ] ; then
 		echo "cloud" >> /backup/scripts/destinations
@@ -66,10 +66,10 @@ bckcfg=$(dialog --ok-label "Continuer" \
 	--title "CONFIGURATION SAUVEGARDES" \
 	--form "Entrez la configuration de la sauvegarde :" \
 15 80 0 \
-	"Adresse mail de l'envoyeur :"	1 1	"$sender" 		1 40 20 0 \
-	"Adresse mail du destinataire :"	2 1	"$recipient" 		2 40 20 0 \
-	"Nom de l'entreprise :"	3 1	"$sujet" 		3 40 20 0 \
-	"Nom du site :"	4 1	"$site" 		4 40 20 0 \
+	"Adresse mail de l'envoyeur :"	1 1	"$sender" 		1 40 40 0 \
+	"Adresse mail du destinataire :"	2 1	"$recipient" 		2 40 40 0 \
+	"Nom de l'entreprise :"	3 1	"$sujet" 		3 40 40 0 \
+	"Nom du site :"	4 1	"$site" 		4 40 40 0 \
 2>&1 1>&3)
 exec 3>&-
 IFS=$'\n'; bckarray=($bckcfg); unset IFS;
@@ -82,3 +82,4 @@ sed -i 's/recipients=""/recipients="'$recipient'"/g' /backup/scripts/errorhandle
 sed -i 's/site="IFF-01"/site="'$site'"/g' /backup/scripts/errorhandler.sh
 sed -i 's/sujet="ISC"/sujet="'$sujet'"/g' /backup/scripts/errorhandler.sh
 echo "VMISIL" >> /backup/scripts/vmlist
+mount -a
