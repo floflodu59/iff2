@@ -34,7 +34,7 @@ sqluser="postgres" #Changer ici utilisateur SQL
 vmarrayfile="/backup/scripts/vmlist"
 vmlist=$(cat $vmarrayfile)
 destinationsfile="/backup/scripts/destinations"
-destinationslist=$(cat $destinationsfile)
+destinationslist=( $(cat $destinationsfile) )
 
 
 #Codes d'etat :
@@ -80,14 +80,14 @@ function savedb
 	rm /backup/temp/sqllatest.sql
 	for i in "${destinationslist[@]}"
 		do
-			if [ $i -eq "local" ] ; then
+			if [[ $i == "local" ]] ; then
 				mkdir /backup/data/sql/$current_year
 				mkdir /backup/data/sql/$current_year/$current_month
 				mkdir /backup/data/sql/$current_year/$current_month/$current_day
 				rm -rf /backup/data/sql/$last_year/$current_month/$current_day
 				cp /backup/temp/sqllatest.sql.gpg /backup/data/sql/$current_year/$current_month/$current_day/export-$current_date.sql.gpg
 			fi
-			if [ $i -eq "remote" ] ; then
+			if [[ $i == "remote" ]]; then
 				mkdir /backup/remotedata/sql/$current_year
 				mkdir /backup/remotedata/sql/$current_year/$current_month
 				mkdir /backup/remotedata/sql/$current_year/$current_month/$current_day
@@ -112,14 +112,14 @@ function fullsave
 	echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/uploads.tar.gz
 	for i in "${destinationslist[@]}"
 		do
-			if [ $i -eq "local" ] ; then
+			if [[ $i == "local" ]] ; then
 				mkdir /backup/data/uploads/$current_year
 				mkdir /backup/data/uploads/$current_year/$current_month
 				mkdir /backup/data/uploads/$current_year/$current_month/$current_day
 				cp /backup/temp/uploads.tar.gz.gpg /backup/data/uploads/$current_year/$current_month/$current_day/uploads-full-$current_date.tar.gz.gpg
 				cp /backup/temp/uploads.tar.gz.gpg /backup/data/uploads/uploads-full-latest.tar.gz.gpg
 			fi
-			if [ $i -eq "remote" ] ; then
+			if [[ $i == "remote" ]]; then
 				mkdir /backup/remotedata/uploads/$current_year
 				mkdir /backup/remotedata/uploads/$current_year/$current_month
 				mkdir /backup/remotedata/uploads/$current_year/$current_month/$current_day
@@ -150,11 +150,11 @@ function saveuploads
 		echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/uploads-incremental.tar.gz
 		for i in "${destinationslist[@]}"
 		do
-			if [ $i -eq "local" ] ; then
+			if [[ $i == "local" ]] ; then
 				cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/data/uploads/$current_year/$current_month/$current_day/uploads-incremental-$current_date.tar.gz.gpg
 				cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/data/uploads/uploads-incremental-latest.tar.gz.gpg
 			fi
-			if [ $i -eq "remote" ] ; then
+			if [[ $i == "remote" ]]; then
 				cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/remotedata/uploads/$current_year/$current_month/$current_day/uploads-incremental-$current_date.tar.gz.gpg
 				cp /backup/temp/uploads-incremental.tar.gz.gpg /backup/remotedata/uploads/uploads-incremental-latest.tar.gz.gpg
 			fi
@@ -188,12 +188,12 @@ function savevms
 			echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/latest.qcow2
 			for i in "${destinationslist[@]}"
 			do
-				if [ $i -eq "local" ] ; then
+				if [[ $i == "local" ]] ; then
 					mkdir /backup/data/vm/$i
 					cp /backup/temp/latest.qcow2.gpg /backup/data/vm/$i/latest.qcow2.gpg
 					virsh dumpxml $i >> /backup/data/vm/$i/latestconfig.xml
 				fi
-				if [ $i -eq "remote" ] ; then
+				if [[ $i == "remote" ]]; then
 					mkdir /backup/remotedata/vm/$i
 					cp /backup/temp/latest.qcow2.gpg /backup/remotedata/vm/$i/latest.qcow2.gpg
 					virsh dumpxml $i >> /backup/remotedata/vm/$i/latestconfig.xml
