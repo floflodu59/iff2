@@ -32,9 +32,10 @@ stamp=$(date +"%Y%m%d")
 #====OTHER====
 sqluser="postgres" #Changer ici utilisateur SQL
 vmarrayfile="/backup/scripts/vmlist"
-vmlist=$(cat $vmarrayfile)
+vmlist=$( (cat $vmarrayfile) )
 destinationsfile="/backup/scripts/destinations"
 destinationslist=( $(cat $destinationsfile) )
+vmsources=( $(cat "/backup/scripts/vmsources") )
 
 
 #Codes d'etat :
@@ -179,6 +180,7 @@ function savevms
 		echo "${current_date}-${precisetime} Sauvegarde des machines virtuelles." >> /backup/latest.log
 		for i in "${vmlist[@]}"
 		do
+			echo ${vmsources[@]}
 			echo "$i"
 			refreshdate
 			echo "${current_date}-${precisetime} Sauvegarde de la machine virtuelle ${i}." >> /backup/latest.log
@@ -186,14 +188,14 @@ function savevms
 			virsh snapshot-create-as $i latest
 			cp /var/lib/libvirt/images/$i.qcow2 /backup/temp/latest.qcow2
 			echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/latest.qcow2
-			for i in "${destinationslist[@]}"
+			for k in "${destinationslist[@]}"
 			do
-				if [[ $i == "local" ]] ; then
+				if [[ $k == "local" ]] ; then
 					mkdir /backup/data/vm/$i
 					cp /backup/temp/latest.qcow2.gpg /backup/data/vm/$i/latest.qcow2.gpg
 					virsh dumpxml $i >> /backup/data/vm/$i/latestconfig.xml
 				fi
-				if [[ $i == "remote" ]]; then
+				if [[ $k == "remote" ]]; then
 					mkdir /backup/remotedata/vm/$i
 					cp /backup/temp/latest.qcow2.gpg /backup/remotedata/vm/$i/latest.qcow2.gpg
 					virsh dumpxml $i >> /backup/remotedata/vm/$i/latestconfig.xml

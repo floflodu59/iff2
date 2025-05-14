@@ -66,7 +66,7 @@ fi
 if [ $status -eq 255 ] ; then
 	exit 255
 fi
-
+echo $guestlocation >> /srv/iff/bin/backup/scripts/vmsources
 echo "CONFIGURATION RESEAU INVITE EN COURS..."
 sed -i 's/pool_dir: "/var/lib/libvirt/images"/pool_dir: '$guestlocation'/g' /srv/iff/bin/isil/p1/kvm_provision.yaml
 sed -i 's/ram_mb: 2048/ram_mb: '$guestram'/g' /srv/iff/bin/isil/p1/kvm_provision.yaml
