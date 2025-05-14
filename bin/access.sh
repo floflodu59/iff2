@@ -42,12 +42,12 @@ function vmhardcconfig {
 	exec 3>&1
 	vmcfg=$(dialog --ok-label "Continuer" \
 			--title "CONFIGURATION DE LINUX" \
-			--form "Entrez la configuration réseau de la VM ISIL :" \
+			--form "Entrez la configuration réseau de la VM ACCESS :" \
 	15 100 0 \
-			"Taille de la VM ISIL en Go :"	1 1	"$guestsize" 		1 45 50 0 \
-			"Taille de la mémoire de la VM ISIL en Mo :"   					2 1	"$guestram"  		2 45 50 0 \
+			"Taille de la VM ACCESS en Go :"	1 1	"$guestsize" 		1 45 50 0 \
+			"Taille de la mémoire de la VM ACCESS en Mo :"   					2 1	"$guestram"  		2 45 50 0 \
 			"Mot de passe root de la machine virtuelle :"   			3 1	"$psswd"  	3 45 50 0 \
-			"Emplacement de la VM ISIL :"   			4 1	"$guestlocation"  	4 45 50 0 \
+			"Emplacement de la VM ACCESS :"   			4 1	"$guestlocation"  	4 45 50 0 \
 	2>&1 1>&3)
 	exec 3>&-
 	IFS=$'\n'; vmcfgarray=($vmcfg); unset IFS;
@@ -56,7 +56,7 @@ function vmhardcconfig {
 	guestpwd=${vmcfgarray[2]}
 	guestlocation=${vmcfgarray[3]}
 	dialog --title "CONFIGURATION RESEAU"  --yesno "Cette configuration est-elle correcte ?\n \nTaille de la VM ISIL en Go : ${vmcfgarray[0]}\nTaille de la mémoire de la VM ISIL en Mo : ${vmcfgarray[1]}\nMot de passe root de la machine virtuelle : ${vmcfgarray[2]}\nEmplacement de la VM ISIL : ${vmcfgarray[3]}" 10 60
-	
+}
 
 vmhardcconfig
 if [ $status -eq 1 ] ; then
