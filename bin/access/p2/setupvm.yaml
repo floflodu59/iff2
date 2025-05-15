@@ -32,6 +32,10 @@
       ansible.builtin.command:
         cmd: apt upgrade -y
 
+    - name: Upgrade to newest
+      ansible.builtin.command:
+        cmd: do-release-upgrade -f DistUpgradeViewNonInteractive
+
     - name: Reboot
       ansible.builtin.reboot:
         reboot_timeout: 120
