@@ -84,7 +84,7 @@ dbcfg=$(dialog --ok-label "Continuer" \
 exec 3>&-
 IFS=$'\n'; dbcfgarray=($dbcfg); unset IFS;
 dbpassword=${dbcfgarray[0]}
-
+echo $dbpassword > /srv/iff/bin/backup/scripts/.psswd
 echo "CONFIGURATION DE LA BASE DE DONNEES"
 systemctl enable postgresql && systemctl start postgresql
 sed -i 's/local   all             postgres                                peer/local   all             postgres                                trust/g' /etc/postgresql/14/main/pg_hba.conf
@@ -109,18 +109,18 @@ do
 		chmod u+x /srv/iff/bin/isil.sh
 		/srv/iff/bin/isil.sh
 	fi
+	if [ $i -eq 2 ] ; then
+		echo "Installation de la machine d'accès..."
+		dos2unix /srv/iff/bin/access.sh
+		chmod u+x /srv/iff/bin/access.sh
+		/srv/iff/bin/access.sh
+	fi
 	if [ $i -eq 3 ] ; then
 		echo "Mise en place de la sauvegarde..."
 		echo $dbpassword > /srv/iff/bin/backup/scripts/.psswd
 		dos2unix /srv/iff/bin/backup.sh
 		chmod u+x /srv/iff/bin/backup.sh
 		/srv/iff/bin/backup.sh
-	fi
-	if [ $i -eq 2 ] ; then
-		echo "Installation de la machine d'accès..."
-		dos2unix /srv/iff/bin/access.sh
-		chmod u+x /srv/iff/bin/access.sh
-		/srv/iff/bin/access.sh
 	fi
 done
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Installation terminée." 10 60

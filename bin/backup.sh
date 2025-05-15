@@ -2,7 +2,6 @@
 
 mkdir /backup
 cp -r /srv/iff/bin/backup/* /backup/
-rm /backup/scripts/.psswd
 dos2unix /backup/scripts/export.sh
 dos2unix /backup/scripts/errorhandler.sh
 chmod u+x /backup/scripts/export.sh
@@ -96,3 +95,4 @@ echo "AuthPass=$pwd" >> /etc/ssmtp/ssmtp.conf
 echo "UseSTARTTLS=YES" >> /etc/ssmtp/ssmtp.conf
 echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf
 echo "VMISIL" >> /backup/scripts/vmlist
+rm /backup/scripts/.psswd
