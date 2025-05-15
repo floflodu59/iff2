@@ -65,10 +65,11 @@ fi
 if [ $status -eq 255 ] ; then
 	exit 255
 fi
-
+echo $guestlocation >> /srv/iff/bin/backup/scripts/vmsources
+sedguestlocation=${guestlocation//\//\\/}
 echo "CONFIGURATION RESEAU INVITE EN COURS..."
 sed -i 's/ram_mb: 2048/ram_mb: '$guestram'/g' /srv/iff/bin/access/p1/kvm_provision.yaml
-sed -i 's/pool_dir: "/var/lib/libvirt/images"/pool_dir: '$guestlocation'/g' /srv/iff/bin/access/p1/kvm_provision.yaml
+sed -i 's/pool_dir: "\/var\/lib\/libvirt\/images"/pool_dir: "'$sedguestlocation'"/g' /srv/iff/bin/access/p1/kvm_provision.yaml
 echo 'echo "CONFIGURATION RESEAU EN COURS..."' > /srv/iff/bin/access/p1/setupnetwork.sh
 echo 'echo "# This is an automatically generated network config file by the IFF project." > /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/access/p1/setupnetwork.sh
 echo 'echo "network:" >> /etc/netplan/00-installer-config.yaml' >> /srv/iff/bin/access/p1/setupnetwork.sh

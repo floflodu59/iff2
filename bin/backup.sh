@@ -53,6 +53,10 @@ do
 		remoteip=${remotecfgarray[0]}
 		remotedir=${remotecfgarray[1]}
 		echo "$remoteip":"$remotedir" "/backup/remotedata nfs defaults 0 0" >> /etc/fstab
+		mount -a
+		mkdir /backup/remotedata/sql
+		mkdir /backup/remotedata/vm
+		mkdir /backup/remotedata/
 	fi
 	if [ $i -eq 3 ] ; then
 		echo "cloud" >> /backup/scripts/destinations
@@ -92,4 +96,3 @@ echo "AuthPass=$pwd" >> /etc/ssmtp/ssmtp.conf
 echo "UseSTARTTLS=YES" >> /etc/ssmtp/ssmtp.conf
 echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf
 echo "VMISIL" >> /backup/scripts/vmlist
-mount -a

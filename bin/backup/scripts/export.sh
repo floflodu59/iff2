@@ -186,7 +186,7 @@ function savevms
 			echo "${current_date}-${precisetime} Sauvegarde de la machine virtuelle ${i}." >> /backup/latest.log
 			virsh snapshot-delete $i latest
 			virsh snapshot-create-as $i latest
-			cp /var/lib/libvirt/images/$i.qcow2 /backup/temp/latest.qcow2
+			cp ${vmsources[@]}/$i.qcow2 /backup/temp/latest.qcow2
 			echo $(cat "$password2")| gpg --batch --yes --passphrase-fd 0 -c /backup/temp/latest.qcow2
 			for k in "${destinationslist[@]}"
 			do
