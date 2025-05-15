@@ -15,6 +15,10 @@
       ansible.builtin.command:
         cmd: resize2fs /dev/vda1
 
+    - name: Install upgrades
+      ansible.builtin.command:
+        cmd: apt upgrade -y
+
     - name: Install Cockpit
       apt: name=cockpit state=present update_cache=true
 
@@ -31,10 +35,6 @@
     - name: Install upgrades
       ansible.builtin.command:
         cmd: apt upgrade -y
-
-    - name: Upgrade to newest
-      ansible.builtin.command:
-        cmd: do-release-upgrade -f DistUpgradeViewNonInteractive
 
     - name: Reboot
       ansible.builtin.reboot:
