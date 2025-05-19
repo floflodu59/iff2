@@ -55,7 +55,7 @@ do
 		mount -a
 		mkdir /backup/remotedata/sql
 		mkdir /backup/remotedata/vm
-		mkdir /backup/remotedata/
+		mkdir /backup/remotedata/uploads
 	fi
 	if [ $i -eq 3 ] ; then
 		echo "cloud" >> /backup/scripts/destinations
