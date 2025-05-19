@@ -12,6 +12,12 @@ mkdir /srv/iff/tmp
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Ce programme permet d'installer les outils de virtualisation pour les déploiments ISIL.\n\nMerci de bien suivre la documentation associée afin de pouvoir completer cette installation avec succès." 10 60
 dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Le programme va maintenant installer les prérequis." 6 60
 apt-get install dos2unix ansible cockpit cockpit-pcp qemu qemu-kvm bridge-utils cpu-checker libvirt-clients libvirt-daemon postgresql cockpit-machines cloud-image-utils ssmtp nfs-kernel-server nfs-common -y
+apt-get install -t jammy-backports cockpit
+apt-get install -t noble-backports cockpit
+mkdir /usr/local/share/cockpit
+mkdir /usr/local/share/cockpit/cockpit-files
+cp /srv/iff/bin/cockpit-files/* /usr/local/share/cockpit/cockpit-files/
+
 function networkconfig {
 	dialog --title "PROGRAMME D'INSTALLATION IFF" --msgbox "Le programme va maintenant afficher les interfaces réseau de votre machine.\nMerci de bien vouloir noter le nom de celle qui doit être utilisée pour le serveur." 9 60
 	ip a
